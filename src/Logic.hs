@@ -4,10 +4,11 @@ module Logic (
   initializeLetterMap,
   letterMapToString,
   isValidGuess,
-  getLetterMapFromWords
+  getLetterMapFromWords,
+  convertAttemptsToShareString
 ) where
 
-import Common.LetterState (LetterState (..), letterStateColor)
+import Common.LetterState (LetterState (..), letterStateColor, letterStateEmoji)
 import Common.Styling (styleString)
 import Common.Constants (wordleWordLength)
 import Words (isValidWord)
@@ -49,3 +50,9 @@ getLetterMapFromWords attempt actual = finalLetterMap
     zippedWords = zip attempt actual
     initialLetterMap = map (\x -> (fst x, uncurry mapInitialLetterMap x actual)) zippedWords
     finalLetterMap = initialLetterMap
+
+convertAttemptToShareString :: LetterMap -> [String]
+convertAttemptToShareString = map (letterStateEmoji . snd)
+
+convertAttemptsToShareString :: [LetterMap] -> String
+convertAttemptsToShareString attempts = unlines $ map (unwords . convertAttemptToShareString) attempts

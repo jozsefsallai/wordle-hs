@@ -6,7 +6,7 @@ import Common.GameState (GameState (..), getFinalMessage)
 import Words (getOfficialWordOfDay, wordleWords, getWordWithIndex)
 import Utils (prompt, lowercase)
 import Common.Constants (wordleMaxGuesses)
-import Logic (isValidGuess, LetterMap, initializeLetterMap, getLetterMapFromWords, letterMapToString)
+import Logic (isValidGuess, LetterMap, initializeLetterMap, getLetterMapFromWords, letterMapToString, convertAttemptsToShareString)
 import Common.Styling (styleString, red, bold)
 
 -- Data types
@@ -30,11 +30,6 @@ data Game = Game {
 
 -- Internal members
 
--- | Prints out the final message.
---   TODO: handle saving.
-handleGameEnd :: Game -> IO ()
-handleGameEnd (Game _ _ gameState word currentIndex alphabet guesses) = putStrLn $ getFinalMessage gameState currentIndex word
-
 printHelp :: LetterMap -> [LetterMap] -> IO ()
 printHelp alphabet guesses = do
   putStrLn $ letterMapToString alphabet
@@ -45,6 +40,22 @@ printHelp alphabet guesses = do
     putStrLn ""
   else
     putStrLn ""
+
+printShareString :: [LetterMap] -> Int -> GameState -> IO ()
+printShareString guesses attempts gameState = do
+  let attemptsString = if gameState == GameStateLost then "X" else show attempts
+  putStrLn $ "Wordle " ++ attemptsString ++ "/6"
+  putStrLn ""
+  putStrLn $ convertAttemptsToShareString guesses
+
+-- | Prints out the final message.
+--   TODO: handle saving.
+handleGameEnd :: Game -> IO ()
+handleGameEnd (Game _ _ gameState word currentIndex alphabet guesses) = do
+  printHelp alphabet guesses
+  putStrLn $ getFinalMessage gameState currentIndex word
+  putStrLn ""
+  printShareString guesses currentIndex gameState
 
 -- | The main game loop which will be run until the game is over or the user
 --   guesses the word.
