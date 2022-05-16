@@ -3,9 +3,11 @@ module Game (GameType (..), startGame) where
 import Data.Time (getCurrentTime)
 import System.Random (randomRIO)
 import Common.GameState (GameState (..), getFinalMessage)
-import Words (getOfficialWordOfDay, wordleWords, getWordWithIndex, isValidWord)
+import Words (getOfficialWordOfDay, wordleWords, getWordWithIndex)
 import Utils (prompt, lowercase)
-import Common.Constants (wordleMaxGuesses, wordleWordLength)
+import Common.Constants (wordleMaxGuesses)
+import Logic (isValidGuess, LetterMap, initializeLetterMap, getLetterMapFromWords, letterMapToString)
+import Common.Styling (styleString, red, bold)
 
 -- Data types
 
@@ -21,7 +23,9 @@ data Game = Game {
   gameType :: GameType,
   gameState :: GameState,
   word :: String,
-  currentIndex :: Int
+  currentIndex :: Int,
+  alphabet :: LetterMap,
+  guesses :: [LetterMap]
 }
 
 -- Internal members
@@ -29,34 +33,45 @@ data Game = Game {
 -- | Prints out the final message.
 --   TODO: handle saving.
 handleGameEnd :: Game -> IO ()
-handleGameEnd (Game _ _ gameState word currentIndex) = putStrLn $ getFinalMessage gameState currentIndex word
+handleGameEnd (Game _ _ gameState word currentIndex alphabet guesses) = putStrLn $ getFinalMessage gameState currentIndex word
 
--- | Checks whether the provided word is a valid guess. A guess is valid if it
---   has the correct length and is considered by the game to be a valid word.
-isValidGuess :: String -> Bool
-isValidGuess guess = length guess == wordleWordLength && isValidWord guess
+printHelp :: LetterMap -> [LetterMap] -> IO ()
+printHelp alphabet guesses = do
+  putStrLn $ letterMapToString alphabet
+
+  if not (null guesses) then do
+    putStrLn ""
+    mapM_ (putStrLn . letterMapToString) guesses
+    putStrLn ""
+  else
+    putStrLn ""
 
 -- | The main game loop which will be run until the game is over or the user
 --   guesses the word.
 gameLoop :: Game -> IO ()
-gameLoop (Game gameId gameType GameStateRunning word currentIndex) = do
+gameLoop (Game gameId gameType GameStateRunning word currentIndex alphabet guesses) = do
   if currentIndex == wordleMaxGuesses then do
-    gameLoop $ Game gameId gameType GameStateLost word currentIndex
+    gameLoop $ Game gameId gameType GameStateLost word currentIndex alphabet guesses
   else do
+    printHelp alphabet guesses
+
     let newIndex = currentIndex + 1
     rawGuess <- prompt ("Guess #" ++ show newIndex ++ ": ")
+    putStrLn ""
     let guess = lowercase rawGuess
 
     if isValidGuess guess then do
-      if guess == word then gameLoop (Game gameId gameType GameStateWon word newIndex)
-      else gameLoop (Game gameId gameType GameStateRunning word newIndex)
+      let newGuesses = guesses ++ [getLetterMapFromWords guess word]
+      if guess == word then gameLoop (Game gameId gameType GameStateWon word newIndex alphabet newGuesses)
+      else gameLoop (Game gameId gameType GameStateRunning word newIndex alphabet newGuesses)
     else do
-      putStrLn "Invalid word length or unknown word. Please try again."
-      gameLoop (Game gameId gameType GameStateRunning word currentIndex)
-gameLoop (Game gameId gameType gameState word 6) =
-  handleGameEnd (Game gameId gameType gameState word 6)
-gameLoop (Game gameId gameType gameState word currentIndex) =
-  handleGameEnd (Game gameId gameType gameState word currentIndex)
+      putStrLn $ styleString "Invalid word length or unknown word. Please try again." [red, bold]
+      putStrLn ""
+      gameLoop (Game gameId gameType GameStateRunning word currentIndex alphabet guesses)
+gameLoop (Game gameId gameType gameState word 6 alphabet guesses) =
+  handleGameEnd (Game gameId gameType gameState word 6 alphabet guesses)
+gameLoop (Game gameId gameType gameState word currentIndex alphabet guesses) =
+  handleGameEnd (Game gameId gameType gameState word currentIndex alphabet guesses)
 
 -- | Starts a new game in "daily" mode.
 startDailyGame :: IO ()
@@ -69,7 +84,9 @@ startDailyGame = do
     gameType = GameTypeDaily,
     gameState = GameStateRunning,
     word = word,
-    currentIndex = 0
+    currentIndex = 0,
+    alphabet = initializeLetterMap,
+    guesses = []
   }
 
   gameLoop game
@@ -85,7 +102,9 @@ startRandomGame = do
     gameType = GameTypeRandom,
     gameState = GameStateRunning,
     word = word,
-    currentIndex = 0
+    currentIndex = 0,
+    alphabet = initializeLetterMap,
+    guesses = []
   }
 
   gameLoop game

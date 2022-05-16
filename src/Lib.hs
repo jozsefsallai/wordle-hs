@@ -7,6 +7,8 @@ import Common.Styling (styleString, green, yellow, gray, bold)
 import Control.Monad (forM_)
 import Utils (prompt)
 import GHC.IO.Encoding (setLocaleEncoding, utf8)
+import Logic (initializeLetterMap, letterMapToString)
+import Common.LetterState (LetterState(LetterStateContainsMatch, LetterStateExactMatch, LetterStateNoMatch))
 
 -- | Wrapper function to display the application's logo with some quirky
 --   formatting.
