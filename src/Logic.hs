@@ -18,9 +18,11 @@ import Data.List (find)
 -- | A letter map will preserve the state of each letter in the alphabet.
 type LetterMap = [(Char, LetterState)]
 
+-- | Styles a character based on its letter state.
 formatCharWithState :: (Char, LetterState) -> String
 formatCharWithState (ch, state) = styleString [ch] [letterStateColor state]
 
+-- | Converts a letter map to a styled string.
 letterMapToString :: LetterMap -> String
 letterMapToString = unwords . map formatCharWithState
 
@@ -34,18 +36,23 @@ initializeLetterMap = map (, LetterStateUnknown) ['a'..'z']
 isValidGuess :: String -> Bool
 isValidGuess guess = length guess == wordleWordLength && isValidWord guess
 
+-- | Counts how many times a letter can be found in the current letter map.
 countLetterInLetterMap :: Char -> LetterMap -> Int
 countLetterInLetterMap ch letterMap = length $ filter (\(ch', _) -> ch == ch') letterMap
 
+-- | Counts how many times a letter can be found in a word.
 countLetterInWord :: Char -> String -> Int
 countLetterInWord ch word = length $ filter (== ch) word
 
+-- | Creates the initial version of the letter map before post-processing.
 mapInitialLetterMap :: Char -> Char -> String -> LetterState
 mapInitialLetterMap a b word
   | a == b = LetterStateExactMatch
   | countLetterInWord a word > 0 = LetterStateContainsMatch
   | otherwise = LetterStateNoMatch
 
+-- | Checks the relation of the letters in two words and creates a letter map
+--   out of them.
 getLetterMapFromWords :: String -> String -> LetterMap
 getLetterMapFromWords attempt actual = finalLetterMap
   where
@@ -53,6 +60,7 @@ getLetterMapFromWords attempt actual = finalLetterMap
     initialLetterMap = map (\x -> (fst x, uncurry mapInitialLetterMap x actual)) zippedWords
     finalLetterMap = initialLetterMap
 
+-- | Generates the new alphabet based on the results of the last guess.
 generateNewAlphabet :: LetterMap -> LetterMap -> LetterMap
 generateNewAlphabet oldAlphabet lastGuessMap = map (\x -> (fst x, findElementInGuessMap x)) oldAlphabet
   where
@@ -64,8 +72,10 @@ generateNewAlphabet oldAlphabet lastGuessMap = map (\x -> (fst x, findElementInG
           Just (_, state) -> state
           Nothing -> oldState
 
+-- | Converts a single attempt to a share string that consists of emojis.
 convertAttemptToShareString :: LetterMap -> [String]
 convertAttemptToShareString = map (letterStateEmoji . snd)
 
+-- | Converts all atttempts to a share string that consists of emojis.
 convertAttemptsToShareString :: [LetterMap] -> String
 convertAttemptsToShareString attempts = unlines $ map (unwords . convertAttemptToShareString) attempts

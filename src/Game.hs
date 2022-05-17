@@ -30,6 +30,7 @@ data Game = Game {
 
 -- Internal members
 
+-- | Prints out the formatted alphabet and the formatted guesses.
 printHelp :: LetterMap -> [LetterMap] -> IO ()
 printHelp alphabet guesses = do
   putStrLn $ letterMapToString alphabet
@@ -41,6 +42,7 @@ printHelp alphabet guesses = do
   else
     putStrLn ""
 
+-- | Prints out the share string at the end of the game.
 printShareString :: [LetterMap] -> Int -> GameState -> IO ()
 printShareString guesses attempts gameState = do
   let attemptsString = if gameState == GameStateLost then "X" else show attempts
