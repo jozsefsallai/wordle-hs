@@ -20,6 +20,8 @@ dependencies:
   - split
   - time
   - random
+  - aeson
+  - directory
 
 library:
   source-dirs: src

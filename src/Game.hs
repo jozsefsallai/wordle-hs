@@ -1,4 +1,4 @@
-module Game (GameType (..), startGame) where
+module Game (Game, GameType (..), startGame) where
 
 import Data.Time (getCurrentTime)
 import System.Random (randomRIO)
@@ -8,6 +8,8 @@ import Utils (prompt, lowercase)
 import Common.Constants (wordleMaxGuesses)
 import Logic (isValidGuess, LetterMap, initializeLetterMap, getLetterMapFromWords, letterMapToString, convertAttemptsToShareString, generateNewAlphabet)
 import Common.Styling (styleString, red, bold)
+import qualified Save (SaveData (..), saveGame, loadSave)
+import Data.Maybe (isJust, fromJust)
 
 -- Data types
 
@@ -77,9 +79,10 @@ gameLoop (Game gameId gameType GameStateRunning word currentIndex alphabet guess
       let newLetterMap = getLetterMapFromWords guess word
       let newGuesses = guesses ++ [newLetterMap]
       let newAlphabet = generateNewAlphabet alphabet newLetterMap
+      let newGameState = if guess == word then GameStateWon else GameStateRunning
 
-      if guess == word then gameLoop (Game gameId gameType GameStateWon word newIndex newAlphabet newGuesses)
-      else gameLoop (Game gameId gameType GameStateRunning word newIndex newAlphabet newGuesses)
+      Save.saveGame gameId newGameState newIndex newAlphabet newGuesses
+      gameLoop (Game gameId gameType newGameState word newIndex newAlphabet newGuesses)
     else do
       putStrLn $ styleString "Invalid word length or unknown word. Please try again." [red, bold]
       putStrLn ""
@@ -95,7 +98,7 @@ startDailyGame = do
   now <- getCurrentTime
   let (word, idx) = getOfficialWordOfDay now
 
-  let game = Game {
+  let newGame = Game {
     gameId = idx,
     gameType = GameTypeDaily,
     gameState = GameStateRunning,
@@ -105,7 +108,27 @@ startDailyGame = do
     guesses = []
   }
 
-  gameLoop game
+  savedGame <- Save.loadSave
+
+  if isJust savedGame then do
+    let saveData = fromJust savedGame
+
+    if Save.gameId saveData == idx then do
+      let game = Game {
+        gameId = idx,
+        gameType = GameTypeDaily,
+        gameState = Save.gameState saveData,
+        word = word,
+        currentIndex = Save.currentIndex saveData,
+        alphabet = Save.alphabet saveData,
+        guesses = Save.guesses saveData
+      }
+
+      gameLoop game
+    else do
+      gameLoop newGame
+  else do
+    gameLoop newGame
 
 -- | Starts a new game in "random" mode.
 startRandomGame :: IO ()

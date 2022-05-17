@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Common.LetterState (
   LetterState (..),
   letterStateColor,
@@ -5,6 +7,8 @@ module Common.LetterState (
 ) where
 
 import Common.Styling (StyleBlock, white, gray, yellow, green)
+import GHC.Generics (Generic)
+import Data.Aeson (FromJSON, ToJSON)
 
 -- | The state of a letter specifies the letter's relationship with the given
 --   word. A letter can either be unchecked, in the word but on the wrong,
@@ -15,7 +19,10 @@ data LetterState =
   LetterStateExactMatch |
   LetterStateContainsMatch |
   LetterStateNoMatch
-  deriving (Eq, Enum)
+  deriving (Eq, Enum, Generic)
+
+instance FromJSON LetterState
+instance ToJSON LetterState
 
 -- | Specifies what color should the letter be displayed as when printing it to
 --   the terminal, based on its state.

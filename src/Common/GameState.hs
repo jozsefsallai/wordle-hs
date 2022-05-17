@@ -1,14 +1,21 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Common.GameState (
   GameState (..),
   getFinalMessage
 ) where
+import Data.Aeson (FromJSON, ToJSON)
+import GHC.Generics (Generic)
 
 -- | Specifies the state of the game (running, won, lost).
 data GameState =
   GameStateRunning |
   GameStateWon |
   GameStateLost
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic)
+
+instance FromJSON GameState
+instance ToJSON GameState
 
 -- | Change the world... The message that will be displayed at the end of a game
 --   depending on the game's state and the number of attempts.
