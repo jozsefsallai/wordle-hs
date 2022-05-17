@@ -51,6 +51,17 @@ mapInitialLetterMap a b word
   | countLetterInWord a word > 0 = LetterStateContainsMatch
   | otherwise = LetterStateNoMatch
 
+-- | Cleans up the initial letter map so that there are no duplicate letter
+--   matches.
+cleanupLetterMap :: String -> LetterMap -> LetterMap
+cleanupLetterMap word = foldl cleanup []
+  where
+    cleanup :: LetterMap -> (Char, LetterState) -> LetterMap
+    cleanup letterMap (ch, state) =
+      if countLetterInLetterMap ch letterMap < countLetterInWord ch word
+        then (ch, state) : letterMap
+        else (ch, LetterStateNoMatch) : letterMap
+
 -- | Checks the relation of the letters in two words and creates a letter map
 --   out of them.
 getLetterMapFromWords :: String -> String -> LetterMap
@@ -58,7 +69,7 @@ getLetterMapFromWords attempt actual = finalLetterMap
   where
     zippedWords = zip attempt actual
     initialLetterMap = map (\x -> (fst x, uncurry mapInitialLetterMap x actual)) zippedWords
-    finalLetterMap = initialLetterMap
+    finalLetterMap = reverse $ cleanupLetterMap actual initialLetterMap
 
 -- | Generates the new alphabet based on the results of the last guess.
 generateNewAlphabet :: LetterMap -> LetterMap -> LetterMap
