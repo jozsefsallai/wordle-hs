@@ -1,11 +1,13 @@
 # wordle-hs
 
 A terminal-based reimplementation of [Wordle][wordle-url] written in Haskell.
-**This project is currently a work in progress** and it doesn't have all the
-logic implemented.
 
 If you want to play a less primitive version of Wordle in the command line, you
 can try [wordle-cli][wordle-cli-url].
+
+## Demo
+
+[![asciicast](https://asciinema.org/a/iJrbcLJKYLeTOE0iUVnwksZBc.svg)](https://asciinema.org/a/iJrbcLJKYLeTOE0iUVnwksZBc)
 
 ## Requirements
 
