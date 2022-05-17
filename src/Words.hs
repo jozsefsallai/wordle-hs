@@ -50,7 +50,7 @@ isValidWord word = word `elem` validWords || word `elem` wordleWords
 
 -- | Returns the official Wordle (epoch is 2021-06-19).
 getOfficialWordOfDay :: UTCTime -> (String, Int)
-getOfficialWordOfDay now = getWordOfTheDay wordleWords now (read "2021-06-20 00:00:00 UTC")
+getOfficialWordOfDay now = getWordOfTheDay wordleWords now (read "2021-06-19 00:00:00 UTC")
 
 -- | Returns a Wordle from a given index.
 getWordWithIndex :: Int -> (String, Int)

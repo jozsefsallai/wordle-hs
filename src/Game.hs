@@ -92,7 +92,8 @@ gameLoop (Game gameId gameType gameState word 6 alphabet guesses) =
 gameLoop (Game gameId gameType gameState word currentIndex alphabet guesses) =
   handleGameEnd (Game gameId gameType gameState word currentIndex alphabet guesses)
 
--- | Starts a new game in "daily" mode.
+-- | Starts a new game in "daily" mode. If a saved game exists, the game will
+--   resume from the last saved state instead of starting a new game.
 startDailyGame :: IO ()
 startDailyGame = do
   now <- getCurrentTime

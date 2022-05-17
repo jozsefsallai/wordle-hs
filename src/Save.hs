@@ -24,6 +24,7 @@ data SaveData = SaveData {
 instance FromJSON SaveData
 instance ToJSON SaveData
 
+-- | Saves the current state of the game to a JSON file.
 saveGame :: Int -> GameState -> Int -> LetterMap -> [LetterMap] -> IO ()
 saveGame gameId gameState currentIndex alphabet guesses = do
   let saveData = SaveData {
@@ -36,6 +37,7 @@ saveGame gameId gameState currentIndex alphabet guesses = do
 
   encodeFile profileFileName saveData
 
+-- | Loads the latest JSON save file if it exists.
 loadSave :: IO (Maybe SaveData)
 loadSave = do
   saveExists <- doesFileExist profileFileName
