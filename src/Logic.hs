@@ -5,6 +5,7 @@ module Logic (
   letterMapToString,
   isValidGuess,
   getLetterMapFromWords,
+  generateNewAlphabet,
   convertAttemptsToShareString
 ) where
 
@@ -12,6 +13,7 @@ import Common.LetterState (LetterState (..), letterStateColor, letterStateEmoji)
 import Common.Styling (styleString)
 import Common.Constants (wordleWordLength)
 import Words (isValidWord)
+import Data.List (find)
 
 -- | A letter map will preserve the state of each letter in the alphabet.
 type LetterMap = [(Char, LetterState)]
@@ -50,6 +52,17 @@ getLetterMapFromWords attempt actual = finalLetterMap
     zippedWords = zip attempt actual
     initialLetterMap = map (\x -> (fst x, uncurry mapInitialLetterMap x actual)) zippedWords
     finalLetterMap = initialLetterMap
+
+generateNewAlphabet :: LetterMap -> LetterMap -> LetterMap
+generateNewAlphabet oldAlphabet lastGuessMap = map (\x -> (fst x, findElementInGuessMap x)) oldAlphabet
+  where
+    findElementInGuessMap :: (Char, LetterState) -> LetterState
+    findElementInGuessMap (ch, oldState) = newLetterState
+      where
+        lastState = find (\x -> fst x == ch) lastGuessMap
+        newLetterState = case lastState of
+          Just (_, state) -> state
+          Nothing -> oldState
 
 convertAttemptToShareString :: LetterMap -> [String]
 convertAttemptToShareString = map (letterStateEmoji . snd)

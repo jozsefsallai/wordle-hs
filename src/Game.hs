@@ -6,7 +6,7 @@ import Common.GameState (GameState (..), getFinalMessage)
 import Words (getOfficialWordOfDay, wordleWords, getWordWithIndex)
 import Utils (prompt, lowercase)
 import Common.Constants (wordleMaxGuesses)
-import Logic (isValidGuess, LetterMap, initializeLetterMap, getLetterMapFromWords, letterMapToString, convertAttemptsToShareString)
+import Logic (isValidGuess, LetterMap, initializeLetterMap, getLetterMapFromWords, letterMapToString, convertAttemptsToShareString, generateNewAlphabet)
 import Common.Styling (styleString, red, bold)
 
 -- Data types
@@ -72,9 +72,12 @@ gameLoop (Game gameId gameType GameStateRunning word currentIndex alphabet guess
     let guess = lowercase rawGuess
 
     if isValidGuess guess then do
-      let newGuesses = guesses ++ [getLetterMapFromWords guess word]
-      if guess == word then gameLoop (Game gameId gameType GameStateWon word newIndex alphabet newGuesses)
-      else gameLoop (Game gameId gameType GameStateRunning word newIndex alphabet newGuesses)
+      let newLetterMap = getLetterMapFromWords guess word
+      let newGuesses = guesses ++ [newLetterMap]
+      let newAlphabet = generateNewAlphabet alphabet newLetterMap
+
+      if guess == word then gameLoop (Game gameId gameType GameStateWon word newIndex newAlphabet newGuesses)
+      else gameLoop (Game gameId gameType GameStateRunning word newIndex newAlphabet newGuesses)
     else do
       putStrLn $ styleString "Invalid word length or unknown word. Please try again." [red, bold]
       putStrLn ""
