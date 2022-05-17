@@ -13,7 +13,7 @@ import Common.LetterState (LetterState (..), letterStateColor, letterStateEmoji)
 import Common.Styling (styleString)
 import Common.Constants (wordleWordLength)
 import Words (isValidWord)
-import Data.List (find)
+import Data.List (find, intercalate)
 
 -- | A letter map will preserve the state of each letter in the alphabet.
 type LetterMap = [(Char, LetterState)]
@@ -89,4 +89,4 @@ convertAttemptToShareString = map (letterStateEmoji . snd)
 
 -- | Converts all atttempts to a share string that consists of emojis.
 convertAttemptsToShareString :: [LetterMap] -> String
-convertAttemptsToShareString attempts = unlines $ map (unwords . convertAttemptToShareString) attempts
+convertAttemptsToShareString attempts = unlines $ map (intercalate "" . convertAttemptToShareString) attempts
