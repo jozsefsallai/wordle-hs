@@ -35,4 +35,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: wordle-hs-windows
-          path: %APPDATA%/local/bin/wordle-hs-exe.exe
+          path: "%APPDATA%/local/bin/wordle-hs-exe.exe"
