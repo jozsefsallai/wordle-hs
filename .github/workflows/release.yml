@@ -1,0 +1,38 @@
+on: [push]
+name: release
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+    name: Stack build for ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Haskell
+        uses: haskell/actions/setup@v2
+        with:
+          enable-stack: true
+      - name: Build app
+        run: stack build --copy-bins
+      - name: Upload artifacts - Linux
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v3
+        with:
+          name: wordle-hs-linux
+          path: ~/.local/bin/wordle-hs-exe
+      - name: Upload artifacts - macOS
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v3
+        with:
+          name: wordle-hs-macos
+          path: ~/.local/bin/wordle-hs-exe
+      - name: Upload artifacts - Windows
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v3
+        with:
+          name: wordle-hs-windows
+          path: %APPDATA%/local/bin/wordle-hs-exe.exe
