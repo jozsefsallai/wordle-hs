@@ -20,8 +20,8 @@ You may use [GHCup][ghcup-url] to install Haskell and its tools more easily.
 
 ## Getting Started
 
-At the moment, no binary release is provided. You may clone the repository and
-build the app yourself.
+You can download nightly builds [here][nightly-url]. Alternatively, you may
+clone the repository and build the app yourself.
 
 **1. Clone the repo:**
 
@@ -48,3 +48,4 @@ stack run
 [cabal-url]: https://www.haskell.org/cabal/
 [stack-url]: https://docs.haskellstack.org/en/stable/README/
 [ghcup-url]: https://www.haskell.org/ghcup/
+[nightly-url]: https://nightly.link/jozsefsallai/wordle-hs/workflows/release/master
