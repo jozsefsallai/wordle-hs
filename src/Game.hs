@@ -45,21 +45,21 @@ printHelp alphabet guesses = do
     putStrLn ""
 
 -- | Prints out the share string at the end of the game.
-printShareString :: [LetterMap] -> Int -> GameState -> IO ()
-printShareString guesses attempts gameState = do
+printShareString :: Int -> [LetterMap] -> Int -> GameState -> IO ()
+printShareString gameId guesses attempts gameState = do
   let attemptsString = if gameState == GameStateLost then "X" else show attempts
-  putStrLn $ "Wordle " ++ attemptsString ++ "/6"
+  putStrLn $ "Wordle " ++ show gameId ++ " " ++ attemptsString ++ "/6"
   putStrLn ""
   putStrLn $ convertAttemptsToShareString guesses
 
 -- | Prints out the final message.
 --   TODO: handle saving.
 handleGameEnd :: Game -> IO ()
-handleGameEnd (Game _ _ gameState word currentIndex alphabet guesses) = do
+handleGameEnd (Game gameId _ gameState word currentIndex alphabet guesses) = do
   printHelp alphabet guesses
   putStrLn $ getFinalMessage gameState currentIndex word
   putStrLn ""
-  printShareString guesses currentIndex gameState
+  printShareString gameId guesses currentIndex gameState
 
 -- | The main game loop which will be run until the game is over or the user
 --   guesses the word.
