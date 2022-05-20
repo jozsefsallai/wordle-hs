@@ -7,7 +7,7 @@ import Words (getOfficialWordOfDay, wordleWords, getWordWithIndex)
 import Utils (prompt, lowercase)
 import Common.Constants (wordleMaxGuesses)
 import Logic (isValidGuess, LetterMap, initializeLetterMap, getLetterMapFromWords, letterMapToString, convertAttemptsToShareString, generateNewAlphabet)
-import Common.Styling (styleString, red, bold)
+import Common.Styling (errorString)
 import qualified Save (SaveData (..), saveGame, loadSave)
 import Data.Maybe (isJust, fromJust)
 
@@ -84,7 +84,7 @@ gameLoop (Game gameId gameType GameStateRunning word currentIndex alphabet guess
       Save.saveGame gameId newGameState newIndex newAlphabet newGuesses
       gameLoop (Game gameId gameType newGameState word newIndex newAlphabet newGuesses)
     else do
-      putStrLn $ styleString "Invalid word length or unknown word. Please try again." [red, bold]
+      putStrLn $ errorString "Invalid word length or unknown word. Please try again."
       putStrLn ""
       gameLoop (Game gameId gameType GameStateRunning word currentIndex alphabet guesses)
 gameLoop (Game gameId gameType gameState word 6 alphabet guesses) =

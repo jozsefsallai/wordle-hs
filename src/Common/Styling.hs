@@ -29,7 +29,8 @@ module Common.Styling (
   bgCyan,
   bgWhite,
 
-  styleString
+  styleString,
+  errorString
 ) where
 
 -- | Specifies a style of ANSI escape sequences for terminal formatting.
@@ -124,3 +125,7 @@ bgWhite = initStyle 47 49
 styleString :: String -> [StyleBlock] -> String
 styleString str [] = str
 styleString str (s:ss) = open s ++ styleString str ss ++ close s
+
+-- | Styles an error string for printing it to the terminal in red and bold.
+errorString :: String -> String
+errorString str = styleString str [red, bold]

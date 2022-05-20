@@ -3,7 +3,7 @@ module Lib ( runApp ) where
 import Words (getOfficialWordOfDay)
 import Data.Time (getCurrentTime)
 import Game (startGame, GameType (..))
-import Common.Styling (styleString, green, yellow, gray, bold)
+import Common.Styling (styleString, green, yellow, gray, bold, errorString)
 import Control.Monad (forM_)
 import Utils (prompt)
 import GHC.IO.Encoding (setLocaleEncoding, utf8)
@@ -31,7 +31,7 @@ displayLogo = do
 promptGameType :: Bool -> IO (Maybe GameType)
 promptGameType isRetry = do
   if isRetry
-    then putStrLn "Invalid choice. Please try again.\n"
+    then putStrLn $ errorString "Invalid choice. Please try again.\n"
   else
     putStrLn ""
 
