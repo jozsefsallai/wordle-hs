@@ -8,7 +8,7 @@ import Control.Monad (forM_)
 import Utils (prompt)
 import GHC.IO.Encoding (setLocaleEncoding, utf8)
 import Logic (initializeLetterMap, letterMapToString)
-import Common.LetterState (LetterState(LetterStateContainsMatch, LetterStateExactMatch, LetterStateNoMatch))
+import Common.LetterState (LetterState (..))
 
 -- | Wrapper function to display the application's logo with some quirky
 --   formatting.
